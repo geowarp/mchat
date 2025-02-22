@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bot, Send, Trash2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -130,47 +129,26 @@ export default function Chat() {
             {messages.map((message: Message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 mb-4 ${
+                className={`flex mb-4 ${
                   message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
-                  className={`flex gap-3 max-w-[80%] ${
-                    message.role === "user" ? "flex-row-reverse" : "flex-row"
+                  className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
                   }`}
                 >
-                  <Avatar className="w-8 h-8">
-                    {message.role === "user" ? (
-                      <>
-                        <AvatarFallback>U</AvatarFallback>
-                        <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                      </>
-                    ) : (
-                      <>
-                        <AvatarFallback>AI</AvatarFallback>
-                        <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                      </>
-                    )}
-                  </Avatar>
-                  <div
-                    className={`rounded-lg px-4 py-2 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
+                  <pre className="whitespace-pre-wrap font-sans">
                     {message.content}
-                  </div>
+                  </pre>
                 </div>
               </div>
             ))}
 
             {(status === "streaming" || status === "submitted") && (
-              <div className="flex gap-3 mb-4">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback>AI</AvatarFallback>
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                </Avatar>
+              <div className="flex mb-4">
                 <div className="rounded-lg px-4 py-2 bg-muted">
                   <div className="flex gap-1">
                     <span className="animate-bounce">●</span>
