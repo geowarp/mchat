@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useChat } from "@ai-sdk/react";
 import type { Message } from "ai";
 import { Button } from "@/components/ui/button";
@@ -27,7 +29,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export default function ChatAi() {
+export default function Chat() {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const {
     messages,
     input,
@@ -54,6 +57,24 @@ export default function ChatAi() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "44px";
+    }
+    await handleSubmit(e);
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleInputChange(e);
+    // Auto-resize
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "44px";
+      const newHeight = Math.min(e.target.scrollHeight, 308); // 308px is approximately 11 lines
+      textareaRef.current.style.height = `${newHeight}px`;
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-muted/50">
@@ -164,23 +185,34 @@ export default function ChatAi() {
         </CardContent>
 
         <CardFooter className="p-4 pt-0">
-          <form onSubmit={handleSubmit} className="flex w-full gap-2">
-            <Textarea
-              placeholder="Type your message..."
-              value={input}
-              onChange={handleInputChange}
-              rows={1}
-              className="min-h-[44px] resize-none"
-            />
-            <Button
-              type="submit"
-              size="icon"
-              disabled={status === "streaming"}
-              className="h-[44px] w-[44px] shrink-0"
-            >
-              <Send className="w-4 h-4" />
-              <span className="sr-only">Send message</span>
-            </Button>
+          <form onSubmit={handleFormSubmit} className="relative w-full">
+            <div className="relative">
+              <Textarea
+                ref={textareaRef}
+                placeholder="Type your message..."
+                value={input}
+                onChange={handleTextareaChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleFormSubmit(e);
+                  }
+                }}
+                rows={1}
+                className="min-h-[48px] max-h-[308px] resize-none overflow-y-auto pr-[4.5rem] py-[8px]"
+              />
+              <div className="absolute right-3 bottom-[8px] pointer-events-none">
+                <Button
+                  type="submit"
+                  size="icon"
+                  disabled={status === "streaming"}
+                  className="h-8 w-8 shrink-0 pointer-events-auto"
+                >
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">Send message</span>
+                </Button>
+              </div>
+            </div>
           </form>
         </CardFooter>
       </Card>
